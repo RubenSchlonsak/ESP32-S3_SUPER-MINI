@@ -22,7 +22,11 @@ const unsigned long helloInterval = 2000;  // 2 Sekunden
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);  // Bei USB-CDC auf Verbindung warten
+
+  // Maximal 2 Sekunden auf USB-Verbindung warten, dann fortfahren
+  unsigned long start = millis();
+  while (!Serial && millis() - start < 2000);
+
   Serial.println("LED Test gestartet.");
 
   FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
@@ -34,11 +38,12 @@ void loop() {
   leds[0] = CRGB::Purple;
   FastLED.show();
   delay(500);
+
   leds[0] = CRGB::Black;
   FastLED.show();
   delay(500);
 
-  // Alle 2 Sekunden: Hello world (nicht blockierend!)
+  // Alle 2 Sekunden: Hello world
   if (millis() - lastHello >= helloInterval) {
     Serial.println("Hello world");
     lastHello = millis();
